@@ -1,0 +1,3 @@
+CONFIG_BLINK_LED_GPIO=y
+# Heltec WiFi LoRa 32 V3/V3.x: on-board white user LED is on GPIO 35
+CONFIG_BLINK_GPIO=35
