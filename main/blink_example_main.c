@@ -12,6 +12,7 @@
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "sdkconfig.h"
+#include "ssd1306.h"
 
 static const char *TAG = "example";
 
@@ -90,15 +91,28 @@ static void configure_led(void)
 
 void app_main(void)
 {
-
-    /* Configure the peripheral according to the LED type */
     configure_led();
+    ESP_ERROR_CHECK(ssd1306_init());
 
+    uint32_t counter = 0;
     while (1) {
-        ESP_LOGI(TAG, "Turning the LED %s!", s_led_state == true ? "ON" : "OFF");
+        ESP_LOGI(TAG, "count=%lu  led=%s", (unsigned long)counter,
+                 s_led_state ? "ON" : "OFF");
+
         blink_led();
-        /* Toggle the LED state */
         s_led_state = !s_led_state;
-        vTaskDelay(CONFIG_BLINK_PERIOD / portTICK_PERIOD_MS);
+
+        ssd1306_clear();
+        int digits = 1;
+        for (uint32_t t = counter; t >= 10; t /= 10) digits++;
+        int scale_w = SSD1306_WIDTH / (digits * 6);  /* 5 cols + 1 gap per digit */
+        int scale_h = SSD1306_HEIGHT / 7;
+        int scale = scale_w < scale_h ? scale_w : scale_h;
+        if (scale < 1) scale = 1;
+        ssd1306_draw_number_centered(counter, scale);
+        ssd1306_flush();
+
+        counter++;
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }

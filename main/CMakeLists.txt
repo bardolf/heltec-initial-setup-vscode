@@ -1,2 +1,3 @@
-idf_component_register(SRCS "blink_example_main.c"
-                       INCLUDE_DIRS ".")
+idf_component_register(SRCS "ssd1306.c" "blink_example_main.c"
+                       INCLUDE_DIRS "."
+                       REQUIRES esp_driver_i2c esp_driver_gpio)
